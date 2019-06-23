@@ -6,6 +6,14 @@ const app = express();
 
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: false }));
+
+app.get('/', (req, res) => {
+  res.status(200).send({
+    success: 'true',
+    message: 'Heartbeat',
+  })
+});
+
 // get all todos
 app.get('/api/todos', (req, res) => {
   res.status(200).send({
