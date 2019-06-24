@@ -38,7 +38,7 @@ app.post('/api/todos', (req, res) => {
     });
   }
  const todo = {
-   id: db.length + 1,
+   id: Math.max(...db.map(i => i.id)) + 1,
    title: req.body.title,
    description: req.body.description
  }
