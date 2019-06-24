@@ -1,11 +1,13 @@
 import express from 'express';
 import bodyParser from 'body-parser';
 import db from './db/db';
+import cors from 'cors';
 // Set up the express app
 const app = express();
 
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: false }));
+app.use(cors())
 
 app.get('/', (req, res) => {
   res.status(200).send({
@@ -47,7 +49,33 @@ app.post('/api/todos', (req, res) => {
    todo
  })
 });
-	
+
+app.delete('/api/todos/:id', (req, res) => {
+  const id = parseInt(req.params.id, 10);
+  var found = db.findIndex(todo => todo.id == id);
+  if (found > -1) {
+    db.splice(found, 1);
+    return res.status(200).send({
+      success: 'true',
+      message: 'Todo deleted successfuly',
+    });
+  }
+
+  /*db.map((todo, index) => {
+    if (todo.id === id) {
+       db.splice(index, 1);
+       return res.status(200).send({
+         success: 'true',
+         message: 'Todo deleted successfuly',
+       });
+    }
+  });*/
+  return res.status(404).send({
+    success: 'false',
+    message: 'todo not found',
+  });
+});
+
 const PORT = 80;
 
 app.listen(PORT, () => {
