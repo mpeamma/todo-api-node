@@ -61,15 +61,6 @@ app.delete('/api/todos/:id', (req, res) => {
     });
   }
 
-  /*db.map((todo, index) => {
-    if (todo.id === id) {
-       db.splice(index, 1);
-       return res.status(200).send({
-         success: 'true',
-         message: 'Todo deleted successfuly',
-       });
-    }
-  });*/
   return res.status(404).send({
     success: 'false',
     message: 'todo not found',
