@@ -16,9 +16,9 @@ app.get('/', (req, res) => {
     const client = new Client({
         host: process.env.DB_HOST || 'localhost',
         port: process.env.DB_PORT || 5432,
-        user: process.env.DB_USER || 'postgres',
+        user: process.env.DB_USER || 'svcCredera',
         database: process.env.DB ||'postgres',
-        password: process.env.DB_USER || 'mysecretpassword',
+        password: process.env.DB_USER || 'SuperSecurePassword',
       });
     client.query('SELECT NOW()')
       .then(result => res.status(200).send({success: 'true', message: result.rows[0].now }))
