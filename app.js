@@ -1,6 +1,8 @@
 import express from 'express';
 import bodyParser from 'body-parser';
 import db from './db/db';
+import { getSecret } from './aws/aws';
+import { Client } from 'pg';
 import cors from 'cors';
 import { hostname } from 'os';
 
@@ -11,7 +13,33 @@ app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(cors())
 
+const awsRegion = process.env.REGION || 'us-east-1';
+const secretId = process.env.SECRET_ID || 'exampleSecret';
+
+let dbPassword;
+getSecret(awsRegion, secretId).then(value => {dbPassword = value});
+
 app.get('/', (req, res) => {
+  try {
+    const client = new Client({
+        host: process.env.DB_HOST || 'localhost',
+        port: process.env.DB_PORT || 5432,
+        user: process.env.DB_USER || 'svcCredera',
+        database: process.env.DB ||'postgres',
+        password: process.env.DB_PASS || dbPassword || 'SuperSecurePassword',
+      });
+    client.query('SELECT NOW()')
+      .then(result => res.status(200).send({success: 'true', message: result.rows[0].now }))
+      .catch(e => res.status(200).send({success: 'false', message: 'DB Not Connected'}))
+      .then(() => client.end())
+    client.connect();
+  } catch(e) {
+    console.log(e);
+    res.status(200).send({success: 'false', message: 'DB Not Connected'});
+  }
+});
+
+app.get('/hello', (req, res) => {
   return res.status(200).send(`Hello from ${hostname()}`)
 });
 
