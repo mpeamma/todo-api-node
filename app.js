@@ -1,8 +1,8 @@
 import express from 'express';
 import bodyParser from 'body-parser';
 import db from './db/db';
-import { Client } from 'pg';
 import cors from 'cors';
+import { hostname } from 'os';
 
 // Set up the express app
 const app = express();
@@ -12,25 +12,10 @@ app.use(bodyParser.urlencoded({ extended: false }));
 app.use(cors())
 
 app.get('/', (req, res) => {
-  try {
-    const client = new Client({
-        host: process.env.DB_HOST || 'localhost',
-        port: process.env.DB_PORT || 5432,
-        user: process.env.DB_USER || 'svcCredera',
-        database: process.env.DB ||'postgres',
-        password: process.env.DB_PASS || 'SuperSecurePassword',
-      });
-    client.query('SELECT NOW()')
-      .then(result => res.status(200).send({success: 'true', message: result.rows[0].now }))
-      .catch(e => res.status(200).send({success: 'false', message: 'DB Not Connected'}))
-      .then(() => client.end())
-    client.connect();
-  } catch(e) {
-    console.log(e);
-    res.status(200).send({success: 'false', message: 'DB Not Connected'});
-  }
+  return res.status(200).send(`Hello from ${hostname()}`)
 });
 
+//#region endpoints
 // get all todos
 app.get('/api/todos', (req, res) => {
   res.status(200).send({
@@ -82,7 +67,9 @@ app.delete('/api/todos/:id', (req, res) => {
   });
 });
 
-const PORT = 80;
+//#endregion
+
+const PORT = 8081;
 
 app.listen(PORT, () => {
   console.log(`server running on port ${PORT}`)
